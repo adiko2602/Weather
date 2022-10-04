@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import WeatherModule from './modules/WeatherModule';
 import axios from 'axios'
 import { WiDaySunny } from "react-icons/wi";
@@ -17,24 +17,41 @@ function App() {
     setCity(e.target.value);
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if(city) {
-      setLoading(true);
       setWeather(null);
       setResponseError(null);
-      await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&lang=pl&appid=${REACT_APP_WEATHER_API_KEY}`,
-      ).then((res) => {
-        setWeather(res.data);
-      }).catch((err) => {
-        setResponseError(err.response.data.message)
-      })
-      
-      setLoading(false);
+      fetchWeather(city);
       setCity("");
     }
   }
+
+  const setLocalCity = (city) => {
+    localStorage.setItem('city', JSON.stringify(city));
+    return;
+  };
+
+  const fetchWeather = useCallback(async (c) => {
+    setLoading(true);
+    await axios.get(
+      `https://api.openweathermap.org/data/2.5/weather?q=${c}&lang=pl&appid=${REACT_APP_WEATHER_API_KEY}`,
+    ).then((res) => {
+      setWeather(res.data);
+      setLocalCity(c);
+    }).catch((err) => {
+      setLocalCity("");
+      setResponseError(err.response.data.message)
+    })
+    setLoading(false);
+  }, [])
+
+  useEffect(() => {
+    const c = JSON.parse(localStorage.getItem('city'));
+    if (c) {
+      fetchWeather(c);
+    }
+  }, [fetchWeather]);
 
   return (
     <div className='container'>
