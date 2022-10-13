@@ -52,7 +52,7 @@ function App() {
       fetchWeather(c);
     }
   }, [fetchWeather]);
-
+//  mordo wez
   return (
     <div className='container'>
       <div className='header'>
