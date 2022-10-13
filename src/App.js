@@ -53,6 +53,7 @@ function App() {
     }
   }, [fetchWeather]);
 //  mordo wez
+// mordo no jak to tak ?
   return (
     <div className='container'>
       <div className='header'>
